@@ -28,7 +28,13 @@ class Molecule():
 
 
 def xyz_to_mol(xyz_fn):
-    return 
+    with open(xyz_fn, 'r') as f: lines = [l.strip() for l in f.readlines()]
+    charge_dict = {'H': 1}
+    atom_list = []
+    for l in lines[2:]:
+        split = l.split()
+        a = Atom(split[0], [float(s) for s in split[1:]])
+    return Molecule(atom_list)
         
 # Define H2
-H2 = xyz_to_mol(sys.argv[1])
+# H2 = xyz_to_mol(sys.argv[1])
