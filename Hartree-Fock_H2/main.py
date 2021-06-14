@@ -23,7 +23,7 @@ nuc_rep = nuc_repulsion(H2)
 
 print()
 print(f"### Total Energy:: {E+nuc_rep:.5f}")
-print(f"### Total Electronic Energy:: {E:.5f}")
+print(f"### Electronic Energy:: {E:.5f}")
 print(f"### Nuclear Repulsion:: {nuc_rep:.5f}")
 print(f"### Orbital Energy::\t{e[0]:.5f}\t{e[1]:.5f}")
 print(f"### Density Matrix::\n{P}")
