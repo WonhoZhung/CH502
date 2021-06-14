@@ -12,4 +12,4 @@
     python plot.py > /dev/null
 ```
 
-<img src="https://github.com/WonhoZhung/CH502/blob/main/Hartree-Fock_H2/Dissociation_Curve_H2.png" height="200">
+<img src="https://github.com/WonhoZhung/CH502/blob/main/Hartree-Fock_H2/Dissociation_Curve_H2.png" height="400">
