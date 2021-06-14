@@ -5,27 +5,29 @@ import matplotlib.pyplot as plt
 from molecule import Atom, Molecule
 from basis import STO_3G
 from HF import run, nuc_repulsion
-
-a_list = [3.42525 , 0.623914, 0.168855]
-d_list = [0.154329, 0.535328, 0.444635]
+from utils import A_LIST, D_LIST
+from tqdm import tqdm
 
 x_list, y_list = [], []
-for d in [0.1*x for x in range(7, 22)]:
+for d in tqdm([0.01*x for x in range(50,450)]):
 
     atoms = [
-           Atom(1, [0., 0., 0.]),
-           Atom(1, [0., 0., d ])
+           Atom(1, [0., 0., 0.        ]),
+           Atom(1, [0., 0., d/0.529177])
     ]
     mol = Molecule(atoms)
     
     R_list = mol.coords
-    basis_set = [STO_3G(a_list, d_list, R) for R in R_list]
+    basis_set = [STO_3G(A_LIST, D_LIST, R) for R in R_list]
 
-    _, _, e = run(basis_set, mol)
+    _, _, e, E = run(basis_set, mol)
     nuc_rep = nuc_repulsion(mol)
 
     x_list.append(d)
-    y_list.append(e[0]+nuc_rep)
+    y_list.append(E+nuc_rep)
 
 plt.plot(x_list, y_list)
+plt.xlabel("Distance (Å)")
+plt.ylabel("Dissociation Energy (Hartree)")
+plt.title("Dissociation_Curve_H2")
 plt.savefig("Dissociation_Curve_H2.png")

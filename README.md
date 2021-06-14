@@ -4,10 +4,10 @@
 
 ### 1. Run HF with .xyz file
 ```
-    python main.py H2.xyz
+    python main.py $PATH_TO_H2.xyz
 ```
 
 ### 2. Run HF to draw Dissociation Curve
 ```
-    TODO
+    python plot.py > /dev/null
 ```

@@ -1,5 +1,5 @@
 import numpy as np
-from integrals import S, T, V, multi_electron
+from integrals import S, T, V, two_electron
 
 
 def nuc_repulsion(molecule):
@@ -25,7 +25,7 @@ def calc_matrices(basis_set, molecule):
     kinetic = np.zeros((N, N))
     potential = np.zeros((N, N))
     overlap = np.zeros((N, N))
-    multi = np.zeros((N, N, N, N))
+    twoe = np.zeros((N, N, N, N))
     for i, bi in enumerate(basis_set):
         for gi, di in bi.gs:
             for j, bj in enumerate(basis_set):
@@ -38,11 +38,10 @@ def calc_matrices(basis_set, molecule):
                         for gk, dk in bk.gs:
                             for l, bl in enumerate(basis_set):
                                 for gl, dl in bl.gs:
-                                    multi[i,j,k,l] += \
-                                            multi_electron(gi, gj, gk, gl)
-                                    multi[i,j,k,l] *= \
+                                    twoe[i,j,k,l] += \
+                                            two_electron(gi, gj, gk, gl) * \
                                             di*dj*dk*dl
-    return kinetic, potential, overlap, multi
+    return kinetic, potential, overlap, twoe
 
 def calc_error(p_old, p):
     """
@@ -60,7 +59,7 @@ def orthogonalize(m):
     X = np.dot(U, np.dot(m_diag, U.T))
     return X
 
-def run(basis_set, molecule, thr=1e-9, max_iter=1000):
+def run(basis_set, molecule, thr=1e-10, max_iter=1000):
     """
     Run the SCF Iteration
     """
@@ -71,6 +70,12 @@ def run(basis_set, molecule, thr=1e-9, max_iter=1000):
 
     # Number of basis function
     N = len(basis_set)
+
+    # Calculate matrices
+    kinetic, potential, overlap, twoe = \
+            calc_matrices(basis_set, molecule)
+    H_core = kinetic + potential
+    X = orthogonalize(overlap)
 
     # Initialize P
     P = np.zeros((N, N))
@@ -85,23 +90,18 @@ def run(basis_set, molecule, thr=1e-9, max_iter=1000):
     print(f"### Start SCF")
     while error > thr:
         # Back-up P
-        P_old = P
+        P_old = P.copy()
 
-        # Calculate matrices
-        kinetic, potential, overlap, multi = \
-                calc_matrices(basis_set, molecule)
-        H_core = kinetic + potential
         G_ee = np.zeros((N, N))
         for i in range(N):
             for j in range(N):
                 for k in range(N):
                     for l in range(N):
-                        G_ee[i,j] += P[k,l]*(multi[i,j,k,l]-0.5*multi[i,l,k,j])
+                        G_ee[i,j] += P[k,l]*(twoe[i,j,l,k]-0.5*twoe[i,k,l,j])
         F = H_core + G_ee
         
         # Solving the Roothan equation
         # F' = X^TFX
-        X = orthogonalize(overlap) 
         F_prime = np.dot(X.T, np.dot(F, X))
 
         # F'C' = C'e
@@ -109,16 +109,15 @@ def run(basis_set, molecule, thr=1e-9, max_iter=1000):
         # Eigenvalues:: e
         eigenvalues, eigenvectors = np.linalg.eig(F_prime)
         e = eigenvalues[eigenvalues.argsort()]
-        C_prime = eigenvectors[eigenvalues.argsort()]
+        C_prime = eigenvectors[:,eigenvalues.argsort()]
 
         # C = XC'
         C = np.dot(X, C_prime)
 
         # Calculate new P
-        P = np.zeros((N, N))
         for i in range(N):
             for j in range(N):
-                P[i,j] += 2*C[i,0]*C[j,0]
+                P[i,j] = 2*C[i,0]*C[j,0]
 
         error = calc_error(P_old, P)
         
@@ -131,27 +130,15 @@ def run(basis_set, molecule, thr=1e-9, max_iter=1000):
         assert cnt < max_iter, "### Iteration exceeds MAX counts"
 
     print(f"### SCF Converged!!!")
-    return P, C, e
+
+    E = 0.0
+    for i in range(N):
+        for j in range(N):
+            E += 0.5*P[j,i]*(H_core[i,j]+F[i,j])
+
+    return P, C, e, E
 
 
 if __name__ == "__main__":
 
-    from molecule import Atom, Molecule
-    from basis import STO_3G
-    atoms = [
-           Atom(1, [0., 0., 0.]),
-           Atom(1, [0., 0., 1.])
-    ]
-    mol = Molecule(atoms)
-    
-    a_list = [3.42525 , 0.623914, 0.168855]
-    d_list = [0.154329, 0.535328, 0.444635]
-    R_list = mol.coords
-    basis_set = [STO_3G(a_list, d_list, R) for R in R_list]
-
-    t, v, s, ee = calc_matrices(basis_set, mol)
-    print(t)
-    print(v)
-    print(s)
-    print(ee)
-
+    pass

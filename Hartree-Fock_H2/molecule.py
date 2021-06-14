@@ -36,7 +36,7 @@ class Molecule():
 
 def xyz_to_mol(xyz_fn):
     with open(xyz_fn, 'r') as f: lines = [l.strip() for l in f.readlines()]
-    charge_dict = {'H': 1}
+    charge_dict = {'H': 1, 'He': 2}
     atom_list = []
     for l in lines[2:]:
         split = l.split()
@@ -50,5 +50,5 @@ def xyz_to_mol(xyz_fn):
 
 if __name__ == "__main__":
 
-    H2 = xyz_to_mol("H2.xyz")
-    print(type(H2.atoms[0].coord))
+    HeH = xyz_to_mol("../xyz/HeH.xyz")
+    print(HeH)
