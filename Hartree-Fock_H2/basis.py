@@ -6,10 +6,13 @@ class Gaussian():
         """
         params
         a:: Gaussian Exponents
-        d:: Gaussian Centers
+        R:: Gaussian Centers
         """
         self.a = a
         self.R = R
+
+    def __repr__(self):
+        return f"{self.a}\t{self.R}\n"
         
     def prod(self, g2):
         """
@@ -22,24 +25,23 @@ class Gaussian():
         p = self.a + g2.a
         R_p = (self.a*self.R+g2.a*g2.R)/p
         g = Gaussian(p, R_p)
-        return g
+        return g, p, R_p
       
         
 class STO_3G():
   
-    def __init__(self, a_list, R_list, d_list):
+    def __init__(self, a_list, d_list, R):
         """
         params
-        a_list:: list of a
-        R_list:: list of R
+        a_list:: list of a, 
         d_list:: list of d, contraction coefficients
+        R:: center
         """
-        assert len(a_list) == len(R_list) == len(d_list)
+        assert len(a_list) == len(d_list)
         self.a_list = a_list
-        self.R_list = R_list
         self.d_list = d_list
         
-        self.gs = [(Gaussian(a, R), d) for a, R, d in \
-                zip(a_list, R_list, d_list)]
+        self.gs = [(Gaussian(a, R), d) for a, d in \
+                zip(a_list, d_list)]
         self.N = len(self.gs)
       
