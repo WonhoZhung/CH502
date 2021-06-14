@@ -1,4 +1,4 @@
-# CH502
+# CH502:: Quantum Chemistry
 
 ## Hartree-Fock Calculation of H2 Molecule
 

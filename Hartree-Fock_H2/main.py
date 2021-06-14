@@ -1,5 +1,5 @@
 from basis import STO_3G
-from HF import run
+from HF import run, nuc_repulsion
 from molecule import xyz_to_mol
 
 import sys
@@ -37,6 +37,12 @@ basis_set = [STO_3G(a_list, d_list, R) for R in R_list]
 try: P, C, e = run(basis_set, H2)
 except Exception as e: print(e); exit()
 
-print(P)
-print(C)
-print(e)
+# Nuclear Repulsion
+nuc_rep = nuc_repulsion(H2)
+
+print()
+print(f"### Nuclear Repulsion:: {nuc_rep:.5f}")
+print(f"### Orbital Energy::\t{e[0]:.5f}\t{e[1]:.5f}")
+print(f"### Density Matrix::\n{P}")
+#print(C)
+

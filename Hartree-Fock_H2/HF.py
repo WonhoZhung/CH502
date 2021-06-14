@@ -1,6 +1,17 @@
 import numpy as np
 from integrals import S, T, V, multi_electron
 
+
+def nuc_repulsion(molecule):
+    retval = 0.
+    for i in range(molecule.N):
+        for j in range(i+1, molecule.N):
+            if i == j: continue
+            atom_i, atom_j = molecule.atoms[i], molecule.atoms[j]
+            retval += \
+                atom_i.Z*atom_j.Z/np.linalg.norm(atom_i.coord-atom_j.coord)
+    return retval
+
 def calc_matrices(basis_set, molecule):
     """
     params
@@ -37,7 +48,7 @@ def calc_error(p_old, p):
     """
     Calculate RMSE between p_old and p
     """
-    return np.linalg.norm(p_old, p)
+    return np.linalg.norm(p_old - p)
 
 def orthogonalize(m):
     """
@@ -45,10 +56,14 @@ def orthogonalize(m):
     """
     _, U = np.linalg.eig(m)
     m_diag = np.dot(U.T, np.dot(m, U))
-    X = np.dot(U, np.dot(m_diag**-0.5, U.T))
+    m_diag = np.diag(np.diagonal(m_diag)**-0.5)
+    X = np.dot(U, np.dot(m_diag, U.T))
     return X
 
 def run(basis_set, molecule, thr=1e-9, max_iter=1000):
+    """
+    Run the SCF Iteration
+    """
 
     # Print Input Info
     print(f"### Molecule Info\n")
@@ -67,6 +82,7 @@ def run(basis_set, molecule, thr=1e-9, max_iter=1000):
     cnt = 0
 
     # Start iteration
+    print(f"### Start SCF")
     while error > thr:
         # Back-up P
         P_old = P
@@ -102,7 +118,7 @@ def run(basis_set, molecule, thr=1e-9, max_iter=1000):
         P = np.zeros((N, N))
         for i in range(N):
             for j in range(N):
-                P[i,j] += 2*C[i]*C[j]
+                P[i,j] += 2*C[i,0]*C[j,0]
 
         error = calc_error(P_old, P)
         
@@ -133,5 +149,9 @@ if __name__ == "__main__":
     R_list = mol.coords
     basis_set = [STO_3G(a_list, d_list, R) for R in R_list]
 
-    calc_matrices(basis_set, mol)
+    t, v, s, ee = calc_matrices(basis_set, mol)
+    print(t)
+    print(v)
+    print(s)
+    print(ee)
 
