@@ -10,7 +10,7 @@ class Atom():
         coord:: atom coordinate
         """
         self.Z = Z
-        self.coord = coord
+        self.coord = np.array(coord)
 
         
 class Molecule():
@@ -26,6 +26,13 @@ class Molecule():
         self.Zs = [a.Z for a in atoms]
         self.coords = [a.coord for a in atoms]
 
+    def __repr__(self):
+
+        s = "Charge\tCoordinate\n"
+        for z, coord in zip(self.Zs, self.coords):
+            s += f"{z}\t{coord}\n"
+        return s
+
 
 def xyz_to_mol(xyz_fn):
     with open(xyz_fn, 'r') as f: lines = [l.strip() for l in f.readlines()]
@@ -33,8 +40,15 @@ def xyz_to_mol(xyz_fn):
     atom_list = []
     for l in lines[2:]:
         split = l.split()
-        a = Atom(split[0], [float(s) for s in split[1:]])
+        atom_list.append(
+                Atom(charge_dict[split[0]], [float(s) for s in split[1:]])
+        )
     return Molecule(atom_list)
         
 # Define H2
 # H2 = xyz_to_mol(sys.argv[1])
+
+if __name__ == "__main__":
+
+    H2 = xyz_to_mol("H2.xyz")
+    print(type(H2.atoms[0].coord))
