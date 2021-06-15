@@ -2,6 +2,11 @@
 
 ## Hartree-Fock Calculation of H2 Molecule
 
+### 0. Environmental Settings
+```
+    pip install -r requirements.txt
+```
+
 ### 1. Run HF with .xyz file
 ```
     python main.py $PATH_TO_H2.xyz
