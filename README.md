@@ -12,7 +12,7 @@
     python main.py $PATH_TO_H2.xyz
 ```
 
-<img src="https://github.com/WonhoZhung/CH502/blob/main/screenshot.PNG" height="400">
+<img src="https://github.com/WonhoZhung/CH502/blob/main/screenshot.png" height="400">
 
 ### 2. Run HF to draw Dissociation Curve
 ```
