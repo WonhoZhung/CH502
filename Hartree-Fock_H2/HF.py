@@ -3,6 +3,9 @@ from integrals import S, T, V, two_electron
 
 
 def nuc_repulsion(molecule):
+    """
+    Calculate nuclear repulsion between atoms
+    """
     retval = 0.
     for i in range(molecule.N):
         for j in range(i+1, molecule.N):
@@ -131,6 +134,7 @@ def run(basis_set, molecule, thr=1e-10, max_iter=1000):
 
     print(f"### SCF Converged!!!")
 
+    # Calculate total electronic energy
     E = 0.0
     for i in range(N):
         for j in range(N):
